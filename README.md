@@ -152,6 +152,8 @@ data_projet/
 ├── README.md
 └── requirements.txt
 
+![Architecture du projet](images/image1.png)
+
 ```
 
 ## Jeux de Données
