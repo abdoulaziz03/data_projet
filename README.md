@@ -152,7 +152,6 @@ data_projet/
 ├── README.md
 └── requirements.txt
 
-![Schéma d'architecture](./images/image1.jpeg)
 ```
 
 ## Jeux de Données
