@@ -124,7 +124,7 @@ Accéder à `http://localhost:8501` pour explorer :
 python data_collection/insertion_versmongo.py
 ```
 
-## Structure du Projet
+## Structure du Projet et Schéma d'architecture
 
 ```
 data_projet/
@@ -151,6 +151,8 @@ data_projet/
 ├── .gitignore
 ├── README.md
 └── requirements.txt
+
+![Schéma d'architecture](./images/image1.jpeg)
 ```
 
 ## Jeux de Données
