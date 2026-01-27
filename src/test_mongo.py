@@ -4,10 +4,16 @@ import os
 
 load_dotenv()
 
-client = MongoClient(os.getenv("MONGODB_URI"))
+
+
+client = MongoClient(
+    os.getenv("MONGODB_URI"),
+    tls=True,
+    tlsAllowInvalidCertificates=True
+)
 
 try:
-    client.admin.command('ping')
-    print("Connexion à MongoDB réussie!")
+    client.admin.command("ping")
+    print("Connexion MongoDB Atlas réussie")
 except Exception as e:
-    print(f"Erreur de connexion à MongoDB: {e}")
+    print("Erreur de connexion à MongoDB:", e)
