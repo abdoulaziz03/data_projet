@@ -76,11 +76,21 @@ pip install -r requirements.txt
 ```
 
 4. **Configuration MongoDB**
-Créer un fichier `.env` à la racine :
+Créer un fichier `.env` à la racine avec les variables suivantes :
+
+Pour MongoDB local :
 ```env
 MONGODB_URI=mongodb://localhost:27017/
 MONGODB_DB_NAME=votre_base_donnees
 ```
+
+Pour MongoDB Atlas (cloud) :
+```env
+MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority
+MONGODB_DB_NAME=votre_base_donnees
+```
+
+**Note :** Le projet utilise `python-dotenv` pour charger les variables d'environnement. Assurez-vous que le fichier `.env` n'est pas commité dans Git (vérifiez `.gitignore`).
 
 ## Utilisation
 
