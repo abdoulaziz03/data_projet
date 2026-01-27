@@ -1,4 +1,4 @@
-# E-Commerce Analytics Dashboard
+# Projet: E-Commerce Analytics Dashboard
 
 Un projet complet d'analyse de données e-commerce utilisant le dataset RetailRocket pour analyser le comportement des utilisateurs, effectuer des tests A/B et créer un tableau de bord interactif.
 
@@ -32,6 +32,12 @@ Ce projet analyse les données de navigation e-commerce de RetailRocket pour com
 - **Aperçu des données** : Exploration des datasets nettoyés
 - **Export de métriques** : Téléchargement des résultats
 
+## Source de données
+Le dataset utlisé pour ce projet provient de Kaggle.
+Vous pouvez le télécharger via le lien suivant : [RetailRocket](https://www.kaggle.com/retailrocket/ecommerce-dataset)
+
+
+
 ## Technologies Utilisées
 
 - **Python** : Langage principal
@@ -41,6 +47,7 @@ Ce projet analyse les données de navigation e-commerce de RetailRocket pour com
 - **MongoDB** : Stockage des données
 - **Jupyter Notebook** : Analyses exploratoires
 - **Scipy/Statsmodels** : Tests statistiques A/B
+
 
 ## Installation
 
