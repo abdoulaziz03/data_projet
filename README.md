@@ -128,30 +128,23 @@ python data_collection/insertion_versmongo.py
 
 ```
 data_projet/
-├── code/
-│   └── streamlit.py              # Dashboard principal
-├── data/
-│   ├── raw/                      # Données brutes
-│   │   ├── events.csv
-│   │   ├── category_tree.csv
-│   │   └── item_properties_part1.csv
-│   └── clean/                    # Données nettoyées
-│       ├── events_clean.csv
-│       ├── category_tree_clean.csv
-│       └── item_properties_clean.csv
-├── data_collection/
-│   └── insertion_versmongo.py    # Script MongoDB
-├── Notebook/
-│   ├── traitement.ipynb          # Analyse et nettoyage
-│   └── ABtesting.ipynb           # Tests A/B
-├── config/                       # Configuration
-├── docs/                         # Documentation
-├── src/                          # Code source additionnel
-├── .env                          # Variables d'environnement
 ├── .gitignore
 ├── README.md
-└── requirements.txt
-
+├── requirements.txt
+├── code/
+│   └── streamlit.py              # Dashboard principal
+├── data/                         # Données (brutes et nettoyées)
+├── data_collection/
+│   └── insertion_versmongo.py    # Script d'insertion MongoDB
+├── images/
+│   ├── image1.png                # Schéma d'architecture
+│   └── image2.png                # Visualisation des données
+├── Notebook/
+│   ├── traitement.ipynb          # Analyse et nettoyage des données
+│   └── ABtesting.ipynb           # Tests A/B
+└── src/
+    ├── insertion.py              # Code source additionnel
+    └── test_mongo.py             # Test MongoDB
 ```
 ![Architecture du projet](./images/image1.png)
 ## Schéma de l'architecture
