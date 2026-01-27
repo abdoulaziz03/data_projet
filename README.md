@@ -152,9 +152,10 @@ data_projet/
 ├── README.md
 └── requirements.txt
 
-![Architecture du projet](images/image1.png)
-
 ```
+![Architecture du projet](./images/image1.png)
+## Schéma de l'architecture
+
 
 ## Jeux de Données
 
@@ -189,13 +190,15 @@ Le projet utilise le dataset **RetailRocket E-commerce** :
 - Impact sur le taux de conversion
 - Analyse par segment et temporalité
 
-## Contribution
+## Visualisation des données avec streamlit 
 
-1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
+Les données collectées et stockées dans MongoDB sont analysées et visualisées via Tableau et Streamlit pour une exploration approfondie. Voici un aperçu des tableaux de bord créés.
+
+![Visualisation](./images/image2.png)
+
+## Conclusion
+
+Ce projet d'analytics e-commerce a permis de transformer des données brutes complexes en insights stratégiques actionnables. En combinant traitement de données avancé, tests statistiques rigoureux et visualisation interactive, nous avons créé une plateforme complète pour la prise de décision data-driven.
 
 ## 📝 Licence
 
@@ -203,14 +206,8 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 
 ## 👥 Auteur
 
-**Votre Nom** - *Description du rôle*
+**Touré abdoul-aziz** 
 
-## 🙏 Remerciements
-
-- Dataset fourni par [RetailRocket](https://www.kaggle.com/retailrocket/ecommerce-dataset)
-- Communauté Streamlit pour l'inspiration
-- Librairies open-source utilisées
 
 ---
 
-⭐ **Note** : Ce projet est un exemple d'analyse de données e-commerce. Les insights générés peuvent être adaptés selon vos besoins métier spécifiques.
