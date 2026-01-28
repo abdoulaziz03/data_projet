@@ -26,11 +26,17 @@ Ce projet analyse les données de navigation e-commerce de RetailRocket pour com
 - **Analyse UX** : Évaluation des interfaces sur le parcours utilisateur
 
 ### Dashboard Interactif
-- **KPIs principaux** : Métriques essentielles en temps réel
-- **Visualisations avancées** : Graphiques Plotly interactifs
-- **Filtres dynamiques** : Analyse par période, type d'événement
-- **Aperçu des données** : Exploration des datasets nettoyés
-- **Export de métriques** : Téléchargement des résultats
+Le dashboard Streamlit offre une analyse complète des données e-commerce avec 7 sections d'analyse :
+
+- **Vue d'ensemble** : Métriques globales (événements, visiteurs, produits, catégories), distribution des événements et aperçu des datasets
+- **Funnel de conversion** : Analyse du parcours client (vues → panier → achat) avec taux de conversion et visualisation en entonnoir
+- **Top produits** : Classement des produits les plus vus, ajoutés au panier et vendus avec graphiques interactifs
+- **Activité temporelle** : Analyse de l'activité par heure et jour de la semaine, identification des pics d'activité
+- **Comportement utilisateur** : Distribution des sessions, taux de conversion par utilisateur et top utilisateurs actifs
+- **Analyse RFM** : Segmentation avancée des clients acheteurs par fréquence d'achat, statistiques détaillées et recommandations stratégiques
+- **Abandons panier** : Analyse des produits fréquemment abandonnés et taux d'abandon global
+
+Toutes les sections incluent des visualisations Plotly interactives, des métriques en temps réel et des options d'export des données.
 
 ## Source de données
 Le dataset utlisé pour ce projet provient de Kaggle.
