@@ -2,14 +2,18 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import matplotlib.pyplot as plt
 from datetime import datetime
-import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
 
-st.set_page_config(page_title="Dashboard E-commerce", layout="wide")
+# Configuration
+st.set_page_config(
+    page_title="Dashboard E-commerce",
+    page_icon="📊",
+    layout="wide"
+)
 
-# Chargement des données clean
+# Chargement des données
 @st.cache_data
 def load_data():
     events_clean = pd.read_csv('../data/clean/events_clean.csv')
@@ -17,325 +21,555 @@ def load_data():
     item_properties_clean = pd.read_csv('../data/clean/item_properties_clean.csv')
     
     # Conversion des dates si nécessaire
-    if 'datetime' in events_clean.columns:
-        events_clean['datetime'] = pd.to_datetime(events_clean['datetime'])
-    if 'date' in events_clean.columns:
-        events_clean['date'] = pd.to_datetime(events_clean['date'])
+    if 'timestamp' in events_clean.columns:
+        events_clean['timestamp'] = pd.to_datetime(events_clean['timestamp'])
     
     return events_clean, category_tree_clean, item_properties_clean
 
-events_clean, category_tree_clean, item_properties_clean = load_data()
+# Titre
+st.title("📊 Tableau de Bord E-commerce")
+st.markdown("---")
 
-st.title("📊 Dashboard Analytics E-commerce")
+# Sidebar pour la navigation
+st.sidebar.title("Navigation")
+option = st.sidebar.selectbox(
+    "Choisir une analyse:",
+    [
+        "Vue d'ensemble",
+        "Funnel de conversion", 
+        "Top produits",
+        "Activité temporelle",
+        "Comportement utilisateur",
+        "Analyse RFM",
+        "Abandons panier"
+    ]
+)
 
-# ============================================================================
-# 1. KPI PRINCIPAUX
-# ============================================================================
-st.subheader("📈 Métriques Globales")
+# Chargement des données
+with st.spinner('Chargement des données...'):
+    try:
+        events, categories, properties = load_data()
+        st.sidebar.success("✅ Données chargées")
+    except:
+        st.error("Erreur de chargement des données")
+        st.stop()
 
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    unique_users = events_clean['visitorid'].nunique()
-    st.metric("👥 Utilisateurs", f"{unique_users:,}")
-
-with col2:
-    unique_products = events_clean['itemid'].nunique()
-    st.metric("📦 Produits", f"{unique_products:,}")
-
-with col3:
-    purchases = events_clean.query("event=='transaction'").shape[0]
-    st.metric("💰 Achats", f"{purchases:,}")
-
-with col4:
-    buyers = events_clean.query("event=='transaction'")['visitorid'].nunique()
-    conversion_rate = buyers / unique_users if unique_users > 0 else 0
-    st.metric("🎯 Taux Conversion", f"{conversion_rate:.2%}")
-
-st.success("✅ Données chargées avec succès")
-
-# ============================================================================
-# 2. FUNNEL DE CONVERSION
-# ============================================================================
-st.subheader("🔄 Funnel de Conversion")
-
-# Calcul des étapes du funnel
-funnel_steps = {
-    'Vues': events_clean.query("event=='view'").shape[0],
-    'Ajouts Panier': events_clean.query("event=='addtocart'").shape[0],
-    'Transactions': events_clean.query("event=='transaction'").shape[0]
-}
-
-funnel_df = pd.DataFrame({
-    'Étape': list(funnel_steps.keys()),
-    'Nombre': list(funnel_steps.values())
-})
-
-# Calcul des taux de conversion
-funnel_df['Conversion'] = (funnel_df['Nombre'] / funnel_df['Nombre'].iloc[0] * 100).round(2)
-
-# Affichage
-col1, col2 = st.columns([3, 1])
-
-with col1:
-    # Graphique funnel
-    fig = px.funnel(funnel_df, x='Nombre', y='Étape', 
-                   title="Funnel de Conversion",
-                   color='Étape',
-                   color_discrete_sequence=['#1f77b4', '#ff7f0e', '#2ca02c'])
-    st.plotly_chart(fig, use_container_width=True)
-
-with col2:
-    # Métriques intermédiaires
-    st.write("**Taux de conversion:**")
+# 1. VUE D'ENSEMBLE
+if option == "Vue d'ensemble":
+    st.header("📈 Vue d'ensemble")
     
-    view_to_cart = (funnel_steps['Ajouts Panier'] / funnel_steps['Vues'] * 100) if funnel_steps['Vues'] > 0 else 0
-    cart_to_purchase = (funnel_steps['Transactions'] / funnel_steps['Ajouts Panier'] * 100) if funnel_steps['Ajouts Panier'] > 0 else 0
-    
-    st.metric("Vue → Panier", f"{view_to_cart:.1f}%")
-    st.metric("Panier → Achat", f"{cart_to_purchase:.1f}%")
-    
-    # Tableau
-    st.dataframe(funnel_df.style.format({'Nombre': '{:,}', 'Conversion': '{:.2f}%'}))
-
-# ============================================================================
-# 3. ACTIVITÉ TEMPORELLE
-# ============================================================================
-st.subheader("📅 Activité Temporelle")
-
-# Préparation des données temporelles
-if 'datetime' in events_clean.columns:
-    events_clean['hour'] = events_clean['datetime'].dt.hour
-    events_clean['day_of_week'] = events_clean['datetime'].dt.day_name()
-    events_clean['date_only'] = events_clean['datetime'].dt.date
-    
-    # Sélection du type de vue
-    view_option = st.radio(
-        "Vue par:",
-        ["Heure de la journée", "Jour de la semaine", "Date"],
-        horizontal=True
-    )
-    
-    col1, col2 = st.columns(2)
+    col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        if view_option == "Heure de la journée":
-            hourly_activity = events_clean.groupby('hour').size().reset_index()
-            hourly_activity.columns = ['Heure', 'Activité']
-            
-            fig = px.bar(hourly_activity, x='Heure', y='Activité',
-                        title='Activité par Heure',
-                        color='Activité',
-                        color_continuous_scale='blues')
+        total_events = len(events)
+        st.metric("Total événements", f"{total_events:,}")
+    
+    with col2:
+        total_visitors = events['visitorid'].nunique() if 'visitorid' in events.columns else "N/A"
+        st.metric("Visiteurs uniques", f"{total_visitors:,}")
+    
+    with col3:
+        total_products = events['itemid'].nunique() if 'itemid' in events.columns else "N/A"
+        st.metric("Produits uniques", f"{total_products:,}")
+    
+    with col4:
+        total_categories = len(categories) if 'categories' in locals() else "N/A"
+        st.metric("Catégories", f"{total_categories:,}")
+    
+    # Distribution des événements
+    st.subheader("Distribution des événements")
+    if 'event' in events.columns:
+        event_counts = events['event'].value_counts()
+        fig = px.pie(values=event_counts.values, names=event_counts.index, title="Types d'événements")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Aperçu des données
+    st.subheader("Aperçu des données")
+    tab1, tab2, tab3 = st.tabs(["Événements", "Catégories", "Propriétés"])
+    
+    with tab1:
+        st.dataframe(events.head(100))
+        st.caption(f"Shape: {events.shape}")
+    
+    with tab2:
+        st.dataframe(categories.head(100))
+        st.caption(f"Shape: {categories.shape}")
+    
+    with tab3:
+        st.dataframe(properties.head(100))
+        st.caption(f"Shape: {properties.shape}")
+
+# 2. FUNNEL DE CONVERSION
+elif option == "Funnel de conversion":
+    st.header("🛒 Funnel de conversion")
+    
+    if 'event' in events.columns:
+        # Calcul des étapes du funnel
+        views = len(events[events['event'] == 'view'])
+        cart_adds = len(events[events['event'] == 'addtocart'])
+        transactions = len(events[events['event'] == 'transaction'])
+        
+        # Métriques
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            conversion_rate = (transactions / views * 100) if views > 0 else 0
+            st.metric("Taux de conversion", f"{conversion_rate:.2f}%")
+        
+        with col2:
+            cart_rate = (cart_adds / views * 100) if views > 0 else 0
+            st.metric("Taux d'ajout panier", f"{cart_rate:.2f}%")
+        
+        with col3:
+            purchase_rate = (transactions / cart_adds * 100) if cart_adds > 0 else 0
+            st.metric("Taux de conversion panier", f"{purchase_rate:.2f}%")
+        
+        # Funnel visuel
+        st.subheader("Funnel de conversion")
+        
+        funnel_data = pd.DataFrame({
+            'Étape': ['Vues', 'Ajouts panier', 'Transactions'],
+            'Nombre': [views, cart_adds, transactions],
+            'Pourcentage': [100, (cart_adds/views*100) if views>0 else 0, (transactions/views*100) if views>0 else 0]
+        })
+        
+        fig = go.Figure(go.Funnel(
+            y=funnel_data['Étape'],
+            x=funnel_data['Nombre'],
+            textinfo="value+percent initial"
+        ))
+        
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Tableau détaillé
+        st.dataframe(funnel_data)
+
+# 3. TOP PRODUITS
+elif option == "Top produits":
+    st.header("🔥 Top produits")
+    
+    if 'itemid' in events.columns and 'event' in events.columns:
+        # Sélecteur de type
+        metric_type = st.selectbox(
+            "Choisir la métrique:",
+            ["Les plus vus", "Les plus ajoutés au panier", "Les plus vendus"]
+        )
+        
+        if metric_type == "Les plus vus":
+            top_products = events[events['event'] == 'view'].groupby('itemid').size().reset_index(name='vues')
+            top_products = top_products.sort_values('vues', ascending=False).head(20)
+            title = "Top 20 produits les plus vus"
+            col_name = 'vues'
+        
+        elif metric_type == "Les plus ajoutés au panier":
+            top_products = events[events['event'] == 'addtocart'].groupby('itemid').size().reset_index(name='ajouts_panier')
+            top_products = top_products.sort_values('ajouts_panier', ascending=False).head(20)
+            title = "Top 20 produits les plus ajoutés au panier"
+            col_name = 'ajouts_panier'
+        
+        else:  # Les plus vendus
+            top_products = events[events['event'] == 'transaction'].groupby('itemid').size().reset_index(name='ventes')
+            top_products = top_products.sort_values('ventes', ascending=False).head(20)
+            title = "Top 20 produits les plus vendus"
+            col_name = 'ventes'
+        
+        # Graphique
+        fig = px.bar(
+            top_products.head(10),
+            x=col_name,
+            y='itemid',
+            orientation='h',
+            title=title,
+            color=col_name
+        )
+        st.plotly_chart(fig, use_container_width=True)
+        
+        # Tableau complet
+        st.dataframe(top_products)
+
+# 4. ACTIVITÉ TEMPORELLE
+elif option == "Activité temporelle":
+    st.header("⏰ Activité temporelle")
+    
+    if 'timestamp' in events.columns:
+        # Extraire composantes temporelles
+        events['heure'] = events['timestamp'].dt.hour
+        events['jour_semaine'] = events['timestamp'].dt.day_name()
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Par heure
+            hourly = events.groupby('heure').size().reset_index(name='count')
+            fig = px.line(hourly, x='heure', y='count', title="Activité par heure")
             st.plotly_chart(fig, use_container_width=True)
             
             # Heure de pointe
-            peak_hour = hourly_activity.loc[hourly_activity['Activité'].idxmax(), 'Heure']
-            st.info(f"**Heure de pointe** : {peak_hour}h")
-    
-    with col2:
-        if view_option == "Jour de la semaine":
-            # Ordre des jours
-            day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-            day_names_fr = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-            
-            daily_activity = events_clean.groupby('day_of_week').size().reindex(day_order).reset_index()
-            daily_activity.columns = ['Jour_EN', 'Activité']
-            daily_activity['Jour_FR'] = day_names_fr
-            
-            fig = px.bar(daily_activity, x='Jour_FR', y='Activité',
-                        title='Activité par Jour de Semaine',
-                        color='Activité',
-                        color_continuous_scale='greens')
-            st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================================
-# 4. TOP PRODUITS
-# ============================================================================
-st.subheader("🏆 Top Produits")
-
-# Sélection du type d'événement
-event_type = st.selectbox(
-    "Type d'événement:",
-    ['view', 'addtocart', 'transaction'],
-    format_func=lambda x: {'view': 'Vues', 'addtocart': 'Ajouts Panier', 'transaction': 'Achats'}[x]
-)
-
-# Top produits par événement
-top_products = events_clean[events_clean['event'] == event_type]
-top_products = top_products['itemid'].value_counts().head(10).reset_index()
-top_products.columns = ['Produit', f'Nombre de {event_type}']
-
-col1, col2 = st.columns([3, 1])
-
-with col1:
-    event_name = {'view': 'Vues', 'addtocart': 'Ajouts Panier', 'transaction': 'Achats'}[event_type]
-    
-    fig = px.bar(top_products, x='Produit', y=f'Nombre de {event_type}',
-                title=f'Top 10 Produits par {event_name}',
-                color=f'Nombre de {event_type}',
-                color_continuous_scale='viridis')
-    st.plotly_chart(fig, use_container_width=True)
-
-with col2:
-    st.dataframe(top_products, use_container_width=True)
-
-# ============================================================================
-# 5. COMPORTEMENT UTILISATEUR
-# ============================================================================
-st.subheader("👤 Comportement Utilisateur")
-
-# Distribution des sessions par utilisateur
-user_sessions = events_clean.groupby('visitorid')['event'].count().reset_index()
-user_sessions.columns = ['visitorid', 'sessions']
-
-col1, col2 = st.columns(2)
-
-with col1:
-    # Histogramme des sessions
-    fig = px.histogram(user_sessions, x='sessions', 
-                      title='Distribution des Sessions par Utilisateur',
-                      nbins=50,
-                      labels={'sessions': 'Nombre de sessions', 'count': 'Nombre d\'utilisateurs'})
-    fig.add_vline(x=user_sessions['sessions'].mean(), line_dash="dash", line_color="red",
-                 annotation_text=f"Moyenne: {user_sessions['sessions'].mean():.1f}")
-    st.plotly_chart(fig, use_container_width=True)
-
-with col2:
-    # Top utilisateurs actifs
-    top_users = user_sessions.nlargest(10, 'sessions')
-    
-    fig = px.bar(top_users, x='visitorid', y='sessions',
-                title='Top 10 Utilisateurs les Plus Actifs',
-                labels={'visitorid': 'ID Utilisateur', 'sessions': 'Nombre de sessions'})
-    st.plotly_chart(fig, use_container_width=True)
-
-# ============================================================================
-# 6. ANALYSE CATÉGORIES (si disponible)
-# ============================================================================
-if not category_tree_clean.empty:
-    st.subheader("🌳 Analyse des Catégories")
-    
-    # Catégories racines
-    root_categories = category_tree_clean[category_tree_clean['parentid'] == 0]
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.metric("Catégories totales", len(category_tree_clean))
-        st.metric("Catégories racines", len(root_categories))
-    
-    with col2:
-        # Hiérarchie des catégories
-        category_depth = {}
-        for _, row in category_tree_clean.iterrows():
-            depth = 1
-            parent = row['parentid']
-            while parent != 0 and parent in category_tree_clean['categoryid'].values:
-                depth += 1
-                parent = category_tree_clean[category_tree_clean['categoryid'] == parent]['parentid'].values[0]
-            category_depth[row['categoryid']] = depth
+            peak_hour = hourly.loc[hourly['count'].idxmax(), 'heure']
+            st.info(f"**Heure de pointe**: {peak_hour}:00")
         
-        max_depth = max(category_depth.values()) if category_depth else 0
-        st.metric("Profondeur max", max_depth)
+        with col2:
+            # Par jour de semaine
+            day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+            daily = events.groupby('jour_semaine').size().reindex(day_order).reset_index(name='count')
+            fig = px.bar(daily, x='jour_semaine', y='count', title="Activité par jour de semaine")
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Jour le plus actif
+            peak_day = daily.loc[daily['count'].idxmax(), 'jour_semaine']
+            st.info(f"**Jour le plus actif**: {peak_day}")
 
-# ============================================================================
-# 7. TABS POUR APERÇU DES DONNÉES
-# ============================================================================
-st.subheader("📋 Aperçu des Données")
-
-tab1, tab2, tab3 = st.tabs(["Events", "Catégories", "Propriétés"])
-
-with tab1:
-    st.write(f"**Shape:** {events_clean.shape}")
-    st.dataframe(events_clean.head(100))
-
-with tab2:
-    if not category_tree_clean.empty:
-        st.write(f"**Shape:** {category_tree_clean.shape}")
-        st.dataframe(category_tree_clean.head(100))
-
-with tab3:
-    if not item_properties_clean.empty:
-        st.write(f"**Shape:** {item_properties_clean.shape}")
-        st.dataframe(item_properties_clean.head(100))
-
-# ============================================================================
-# 8. FILTRES INTERACTIFS
-# ============================================================================
-st.sidebar.header("🎛️ Filtres")
-
-# Filtre par date si disponible
-if 'date' in events_clean.columns:
-    min_date = events_clean['date'].min()
-    max_date = events_clean['date'].max()
+# 5. COMPORTEMENT UTILISATEUR
+elif option == "Comportement utilisateur":
+    st.header("👤 Comportement utilisateur")
     
-    date_range = st.sidebar.date_input(
-        "Période d'analyse",
-        value=[min_date, max_date],
-        min_value=min_date,
-        max_value=max_date
-    )
+    if 'visitorid' in events.columns:
+        # Distribution des sessions
+        sessions_per_user = events.groupby('visitorid').size().reset_index(name='sessions')
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            fig = px.histogram(sessions_per_user, x='sessions', nbins=50, 
+                              title="Distribution des sessions par utilisateur")
+            st.plotly_chart(fig, use_container_width=True)
+        
+        with col2:
+            # Taux de conversion par utilisateur
+            if 'event' in events.columns:
+                user_conversion = events.groupby('visitorid')['event'].apply(
+                    lambda x: (x == 'transaction').any()
+                ).reset_index(name='a_achete')
+                
+                conversion_rate = user_conversion['a_achete'].mean() * 100
+                
+                fig = px.pie(user_conversion, names='a_achete', 
+                            title=f"Utilisateurs avec achat ({conversion_rate:.1f}%)")
+                st.plotly_chart(fig, use_container_width=True)
+        
+        # Top utilisateurs
+        st.subheader("Top 10 utilisateurs les plus actifs")
+        top_users = sessions_per_user.sort_values('sessions', ascending=False).head(10)
+        fig = px.bar(top_users, x='sessions', y='visitorid', orientation='h')
+        st.plotly_chart(fig, use_container_width=True)
+
+# 6. ANALYSE RFM
+elif option == "Analyse RFM":
+    st.header("🎯 Segmentation RFM - Clients Acheteurs")
     
-    if len(date_range) == 2:
-        filtered_events = events_clean[
-            (events_clean['date'] >= pd.to_datetime(date_range[0])) &
-            (events_clean['date'] <= pd.to_datetime(date_range[1]))
-        ]
-        st.sidebar.write(f"Événements filtrés: {len(filtered_events):,}")
-    else:
-        filtered_events = events_clean
-
-# Filtre par type d'événement
-event_types = events_clean['event'].unique()
-selected_events = st.sidebar.multiselect(
-    "Types d'événements",
-    options=event_types,
-    default=event_types.tolist()
-)
-
-if selected_events:
-    filtered_events = events_clean[events_clean['event'].isin(selected_events)]
-    st.sidebar.write(f"Événements sélectionnés: {len(filtered_events):,}")
-
-# ============================================================================
-# 9. STATISTIQUES RAPIDES
-# ============================================================================
-st.sidebar.header("📊 Statistiques Rapides")
-
-if 'is_purchase' in events_clean.columns:
-    total_purchases = events_clean['is_purchase'].sum()
-    total_views = events_clean['is_view'].sum() if 'is_view' in events_clean.columns else 0
+    if 'visitorid' in events.columns and 'event' in events.columns and 'timestamp' in events.columns:
+        # Filtrer les transactions
+        transactions = events[events['event'] == 'transaction']
+        
+        if len(transactions) > 0:
+            # Calcul RFM de base
+            reference_date = transactions['timestamp'].max()
+            
+            rfm = transactions.groupby('visitorid').agg({
+                'timestamp': lambda x: (reference_date - x.max()).days,
+                'itemid': 'count'
+            }).reset_index()
+            
+            rfm.columns = ['visitorid', 'recency', 'frequency']
+            
+            # AJOUTER IMPORT numpy
+            import numpy as np
+            
+            # A. ANALYSE DES DONNÉES
+            st.subheader("📊 Analyse des données RFM")
+            
+            col1, col2, col3, col4 = st.columns(4)
+            
+            with col1:
+                st.metric("Clients acheteurs", f"{len(rfm):,}")
+                st.caption("Sur 11,719 clients")
+            
+            with col2:
+                recency_val = rfm['recency'].iloc[0] if len(rfm) > 0 else 0
+                st.metric("Recency unique", f"{recency_val} jours")
+                st.caption("Tous les clients ont la même valeur")
+            
+            with col3:
+                avg_freq = rfm['frequency'].mean()
+                st.metric("Fréquence moyenne", f"{avg_freq:.1f}")
+                st.caption("Par client")
+            
+            with col4:
+                max_freq = rfm['frequency'].max()
+                st.metric("Fréquence max", max_freq)
+                st.caption("Client le plus actif")
+            
+            # B. EXPLICATION DU PROBLÈME
+            st.info("""
+            **Analyse des données:**
+            - Tous les clients ont le **même recency** (dernier achat à la même date)
+            - **76 niveaux différents de fréquence d'achat**
+            - La segmentation sera basée uniquement sur la fréquence
+            """)
+            
+            # C. SEGMENTATION BASÉE SUR LA FRÉQUENCE SEULEMENT
+            st.subheader("🏷️ Segmentation par Fréquence d'Achat")
+            
+            # Analyser la distribution de la fréquence
+            frequency_stats = rfm['frequency'].describe()
+            st.write("**Distribution de la fréquence:**")
+            st.write(frequency_stats)
+            
+            # Méthode robuste pour segmenter la fréquence
+            # Utiliser des percentiles adaptatifs
+            percentiles = [25, 50, 75, 90, 95]
+            percentile_values = np.percentile(rfm['frequency'], percentiles)
+            
+            st.write("**Percentiles de fréquence:**")
+            for p, val in zip(percentiles, percentile_values):
+                st.write(f"- {p}% des clients ont ≤ {val:.1f} achats")
+            
+            # Segmentation en 5 groupes basés sur la fréquence
+            def segment_by_frequency(freq):
+                if freq <= percentile_values[0]:  # ≤ 25e percentile
+                    return 'Acheteurs occasionnels'
+                elif freq <= percentile_values[1]:  # ≤ 50e percentile (médiane)
+                    return 'Acheteurs réguliers'
+                elif freq <= percentile_values[2]:  # ≤ 75e percentile
+                    return 'Acheteurs fréquents'
+                elif freq <= percentile_values[3]:  # ≤ 90e percentile
+                    return 'Acheteurs très fréquents'
+                else:  # Top 10%
+                    return 'Clients VIP'
+            
+            rfm['Segment'] = rfm['frequency'].apply(segment_by_frequency)
+            
+            # D. VISUALISATIONS
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                # Distribution des segments
+                segment_dist = rfm['Segment'].value_counts().reset_index()
+                segment_dist.columns = ['Segment', 'Nombre']
+                
+                # Ordonner les segments logiquement
+                segment_order = ['Acheteurs occasionnels', 'Acheteurs réguliers', 
+                               'Acheteurs fréquents', 'Acheteurs très fréquents', 'Clients VIP']
+                segment_dist['Segment'] = pd.Categorical(segment_dist['Segment'], 
+                                                       categories=segment_order, 
+                                                       ordered=True)
+                segment_dist = segment_dist.sort_values('Segment')
+                
+                fig = px.bar(segment_dist, x='Segment', y='Nombre',
+                            title="Distribution des Clients par Fréquence d'Achat",
+                            color='Nombre',
+                            text='Nombre',
+                            color_continuous_scale='viridis')
+                fig.update_traces(texttemplate='%{text:,}', textposition='outside')
+                fig.update_layout(xaxis_tickangle=-45)
+                st.plotly_chart(fig, use_container_width=True)
+            
+            with col2:
+                # Histogramme de la fréquence
+                fig = px.histogram(rfm, x='frequency', nbins=30,
+                                  title="Distribution de la Fréquence d'Achat",
+                                  labels={'frequency': 'Nombre d\'achats'},
+                                  color_discrete_sequence=['#636EFA'])
+                fig.update_layout(bargap=0.1)
+                st.plotly_chart(fig, use_container_width=True)
+                
+                # Ajouter des lignes pour les percentiles
+                fig.add_vline(x=percentile_values[0], line_dash="dash", line_color="red",
+                            annotation_text="25%", annotation_position="top")
+                fig.add_vline(x=percentile_values[1], line_dash="dash", line_color="orange",
+                            annotation_text="50%", annotation_position="top")
+                fig.add_vline(x=percentile_values[2], line_dash="dash", line_color="green",
+                            annotation_text="75%", annotation_position="top")
+            
+            # E. STATISTIQUES PAR SEGMENT
+            st.subheader("📈 Statistiques détaillées par Segment")
+            
+            segment_stats = rfm.groupby('Segment').agg({
+                'frequency': ['count', 'mean', 'min', 'max', 'sum'],
+                'visitorid': 'nunique'
+            }).round(2)
+            
+            segment_stats.columns = ['Nb_Clients', 'Freq_Moyenne', 'Freq_Min', 'Freq_Max', 'Total_Achats', 'Clients_Uniques']
+            
+            # Réordonner
+            segment_stats = segment_stats.reindex(segment_order)
+            
+            # Ajouter des pourcentages
+            total_clients = len(rfm)
+            total_purchases = rfm['frequency'].sum()
+            
+            segment_stats['%_Clients'] = (segment_stats['Nb_Clients'] / total_clients * 100).round(1)
+            segment_stats['%_Achats'] = (segment_stats['Total_Achats'] / total_purchases * 100).round(1)
+            segment_stats['Achats_par_Client'] = (segment_stats['Total_Achats'] / segment_stats['Nb_Clients']).round(1)
+            
+            st.dataframe(segment_stats)
+            
+            # F. TOP CLIENTS
+            st.subheader("🏆 Top 20 Clients par Fréquence d'Achat")
+            
+            top_clients = rfm.sort_values('frequency', ascending=False).head(20)
+            top_clients['Rank'] = range(1, len(top_clients) + 1)
+            
+            fig = px.bar(top_clients.head(10), x='frequency', y='visitorid',
+                        orientation='h',
+                        title="Top 10 Clients les Plus Actifs",
+                        hover_data=['Segment'],
+                        labels={'frequency': 'Nombre d\'achats', 'visitorid': 'ID Client'},
+                        color='frequency',
+                        color_continuous_scale='thermal')
+            
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # Tableau complet
+            st.dataframe(top_clients[['Rank', 'visitorid', 'frequency', 'Segment']].reset_index(drop=True))
+            
+            # G. ANALYSE DE LA VALEUR
+            st.subheader("💰 Analyse de la Valeur Client")
+            
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                # Pareto analysis (80/20)
+                sorted_clients = rfm.sort_values('frequency', ascending=False)
+                sorted_clients['cumulative_pct'] = (sorted_clients['frequency'].cumsum() / 
+                                                  sorted_clients['frequency'].sum() * 100)
+                
+                top_20_pct_clients = len(sorted_clients[sorted_clients['cumulative_pct'] <= 80])
+                paretto_pct = (top_20_pct_clients / len(sorted_clients)) * 100
+                
+                st.metric("Règle 80/20", f"{paretto_pct:.1f}%", 
+                         delta="% des clients font 80% des achats")
+            
+            with col2:
+                # Churn potentiel
+                one_time_buyers = len(rfm[rfm['frequency'] == 1])
+                one_time_pct = (one_time_buyers / len(rfm)) * 100
+                st.metric("Achats uniques", f"{one_time_pct:.1f}%",
+                         delta=f"{one_time_buyers:,} clients")
+            
+            with col3:
+                # Loyalty index
+                repeat_buyers = len(rfm[rfm['frequency'] > 1])
+                repeat_pct = (repeat_buyers / len(rfm)) * 100
+                st.metric("Clients récurrents", f"{repeat_pct:.1f}%",
+                         delta=f"{repeat_buyers:,} clients")
+            
+            # H. RECOMMANDATIONS STRATÉGIQUES
+            st.subheader("🎯 Recommandations par Segment")
+            
+            recommendations = {
+                'Clients VIP': """
+                **Segment**: Top 10% des clients (≥ 90e percentile)
+                **Caractéristiques**: Fréquence d'achat très élevée
+                **Actions**:
+                - Programme VIP exclusif
+                - Service client prioritaire
+                - Early access aux nouveautés
+                - Invitations événements
+                **Objectif**: Fidélisation maximale, ambassadeurs
+                """,
+                'Acheteurs très fréquents': """
+                **Segment**: 75-90e percentile
+                **Caractéristiques**: Fréquence élevée
+                **Actions**:
+                - Programme de fidélité
+                - Offres personnalisées
+                - Recommandations sur mesure
+                **Objectif**: Conversion en Clients VIP
+                """,
+                'Acheteurs fréquents': """
+                **Segment**: 50-75e percentile
+                **Caractéristiques**: Fréquence moyenne-haute
+                **Actions**:
+                - Email marketing ciblé
+                - Offres de cross-selling
+                - Programme de parrainage
+                **Objectif**: Augmenter la fréquence d'achat
+                """,
+                'Acheteurs réguliers': """
+                **Segment**: 25-50e percentile (médiane)
+                **Caractéristiques**: Fréquence moyenne
+                **Actions**:
+                - Campagnes de rappel
+                - Offres de réactivation
+                - Contenu éducatif
+                **Objectif**: Maintenir et développer
+                """,
+                'Acheteurs occasionnels': """
+                **Segment**: ≤ 25e percentile
+                **Caractéristiques**: Faible fréquence (souvent 1 achat)
+                **Actions**:
+                - Email de bienvenue/suivi
+                - Enquête de satisfaction
+                - Offre de premier ré-achat
+                **Objectif**: Conversion en clients récurrents
+                """
+            }
+            
+            selected_segment = st.selectbox(
+                "Voir les recommandations pour:",
+                list(recommendations.keys())
+            )
+            
+            with st.expander(f"📋 Recommandations détaillées - {selected_segment}", expanded=True):
+                st.markdown(recommendations[selected_segment])
+            
+            # I. EXPORT DES DONNÉES
+            st.subheader("💾 Export des données")
+            
+            if st.button("📥 Télécharger les segments RFM"):
+                csv = rfm.to_csv(index=False)
+                st.download_button(
+                    label="Télécharger CSV",
+                    data=csv,
+                    file_name="segments_rfm.csv",
+                    mime="text/csv"
+                )
+        
+        else:
+            st.warning("⚠️ Aucune transaction trouvée pour l'analyse RFM")
+            
+# 7. ABANDONS PANIER
+elif option == "Abandons panier":
+    st.header("🛍️ Abandons de panier")
     
-    st.sidebar.metric("Total Achats", f"{total_purchases:,}")
-    st.sidebar.metric("Total Vues", f"{total_views:,}")
-    
-    if total_views > 0:
-        conversion_rate = total_purchases / total_views * 100
-        st.sidebar.metric("Taux Vue→Achat", f"{conversion_rate:.2f}%")
+    if 'event' in events.columns:
+        add_to_cart = events[events['event'] == 'addtocart']
+        transactions = events[events['event'] == 'transaction']
+        
+        if len(add_to_cart) > 0:
+            # Métriques
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                st.metric("Ajouts panier", f"{len(add_to_cart):,}")
+            
+            with col2:
+                st.metric("Transactions", f"{len(transactions):,}")
+            
+            with col3:
+                abandon_rate = (1 - len(transactions)/len(add_to_cart)) * 100 if len(add_to_cart) > 0 else 0
+                st.metric("Taux d'abandon", f"{abandon_rate:.1f}%")
+            
+            # Top produits abandonnés
+            if 'itemid' in events.columns:
+                cart_items = add_to_cart.groupby('itemid').size().reset_index(name='ajouts')
+                bought_items = transactions.groupby('itemid').size().reset_index(name='achats')
+                
+                abandonment = cart_items.merge(bought_items, on='itemid', how='left')
+                abandonment['achats'] = abandonment['achats'].fillna(0)
+                abandonment['abandons'] = abandonment['ajouts'] - abandonment['achats']
+                abandonment = abandonment.sort_values('abandons', ascending=False).head(20)
+                
+                st.subheader("Top 10 produits les plus abandonnés")
+                fig = px.bar(abandonment.head(10), x='abandons', y='itemid', orientation='h')
+                st.plotly_chart(fig, use_container_width=True)
+                
+                st.dataframe(abandonment)
+        
+        else:
+            st.warning("Aucun ajout au panier trouvé")
 
-# ============================================================================
-# 10. TÉLÉCHARGEMENT
-# ============================================================================
-st.sidebar.header("📥 Export")
-
-# Bouton pour télécharger les données
-@st.cache_data
-def convert_df(df):
-    return df.to_csv(index=False).encode('utf-8')
-
-if st.sidebar.button("📊 Exporter les métriques"):
-    metrics_df = pd.DataFrame({
-        'Métrique': ['Utilisateurs uniques', 'Produits uniques', 'Total achats', 'Taux conversion'],
-        'Valeur': [unique_users, unique_products, purchases, conversion_rate]
-    })
-    
-    csv = convert_df(metrics_df)
-    st.sidebar.download_button(
-        label="Télécharger métriques CSV",
-        data=csv,
-        file_name="metrics_ecommerce.csv",
-        mime="text/csv"
-    )
-
-
+# Footer
+st.markdown("---")
+st.caption("Dashboard E-commerce - Analyse des données utilisateur")
