@@ -204,7 +204,7 @@ Le projet utilise le dataset **RetailRocket E-commerce** :
 
 Les données collectées et stockées dans MongoDB sont analysées et visualisées via Tableau et Streamlit pour une exploration approfondie. Voici un aperçu des tableaux de bord créés.
 
-![Visualisation](./images/image2.png)
+![Visualisation](./images/imagedsh1.png)
 
 ## Conclusion
 
