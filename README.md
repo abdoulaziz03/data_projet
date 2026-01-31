@@ -46,13 +46,17 @@ Vous pouvez le télécharger via le lien suivant : [RetailRocket](https://www.ka
 
 ## Technologies Utilisées
 
-- **Python** : Langage principal
-- **Pandas** : Manipulation et analyse des données
-- **Streamlit** : Interface web interactive
-- **Plotly** : Visualisations avancées
-- **MongoDB** : Stockage des données
-- **Jupyter Notebook** : Analyses exploratoires
-- **Scipy/Statsmodels** : Tests statistiques A/B
+- **Python 3.8+** : Langage principal
+- **Pandas 2.3.3** : Manipulation et analyse des données
+- **Streamlit** : Interface web interactive (version à vérifier dans requirements.txt)
+- **Plotly** : Visualisations avancées (version à vérifier dans requirements.txt)
+- **MongoDB** : Stockage des données (PyMongo 4.16.0)
+- **Jupyter Notebook 7.5.1** : Analyses exploratoires
+- **Scipy 1.16.3 / Statsmodels 0.14.5** : Tests statistiques A/B
+- **NumPy 2.3.4** : Calculs numériques
+- **Matplotlib 3.10.8** : Graphiques statiques
+- **Seaborn 0.13.2** : Visualisations statistiques
+- **Scikit-learn 1.8.0** : Machine learning
 
 
 ## Installation
@@ -211,6 +215,7 @@ Le projet utilise le dataset **RetailRocket E-commerce** :
 Les données collectées et stockées dans MongoDB sont analysées et visualisées via Tableau et Streamlit pour une exploration approfondie. Voici un aperçu des tableaux de bord créés.
 
 ![Visualisation](./images/imagedsh1.png)
+
 
 ## Conclusion
 
