@@ -1,4 +1,4 @@
-# Projet: E-Commerce Analytics Dashboard
+# E-Commerce Analytics Dashboard
 
 Un projet complet d'analyse de données e-commerce utilisant le dataset RetailRocket pour analyser le comportement des utilisateurs, effectuer des tests A/B et créer un tableau de bord interactif.
 
@@ -26,23 +26,11 @@ Ce projet analyse les données de navigation e-commerce de RetailRocket pour com
 - **Analyse UX** : Évaluation des interfaces sur le parcours utilisateur
 
 ### Dashboard Interactif
-Le dashboard Streamlit offre une analyse complète des données e-commerce avec 7 sections d'analyse :
-
-- **Vue d'ensemble** : Métriques globales (événements, visiteurs, produits, catégories), distribution des événements et aperçu des datasets
-- **Funnel de conversion** : Analyse du parcours client (vues → panier → achat) avec taux de conversion et visualisation en entonnoir
-- **Top produits** : Classement des produits les plus vus, ajoutés au panier et vendus avec graphiques interactifs
-- **Activité temporelle** : Analyse de l'activité par heure et jour de la semaine, identification des pics d'activité
-- **Comportement utilisateur** : Distribution des sessions, taux de conversion par utilisateur et top utilisateurs actifs
-- **Analyse RFM** : Segmentation avancée des clients acheteurs par fréquence d'achat, statistiques détaillées et recommandations stratégiques
-- **Abandons panier** : Analyse des produits fréquemment abandonnés et taux d'abandon global
-
-Toutes les sections incluent des visualisations Plotly interactives, des métriques en temps réel et des options d'export des données.
-
-## Source de données
-Le dataset utlisé pour ce projet provient de Kaggle.
-Vous pouvez le télécharger via le lien suivant : [RetailRocket](https://www.kaggle.com/retailrocket/ecommerce-dataset)
-
-
+- **KPIs principaux** : Métriques essentielles en temps réel
+- **Visualisations avancées** : Graphiques Plotly interactifs
+- **Filtres dynamiques** : Analyse par période, type d'événement
+- **Aperçu des données** : Exploration des datasets nettoyés
+- **Export de métriques** : Téléchargement des résultats
 
 ## Technologies Utilisées
 
@@ -53,7 +41,6 @@ Vous pouvez le télécharger via le lien suivant : [RetailRocket](https://www.ka
 - **MongoDB** : Stockage des données
 - **Jupyter Notebook** : Analyses exploratoires
 - **Scipy/Statsmodels** : Tests statistiques A/B
-
 
 ## Installation
 
@@ -82,21 +69,11 @@ pip install -r requirements.txt
 ```
 
 4. **Configuration MongoDB**
-Créer un fichier `.env` à la racine avec les variables suivantes :
-
-Pour MongoDB local :
+Créer un fichier `.env` à la racine :
 ```env
 MONGODB_URI=mongodb://localhost:27017/
 MONGODB_DB_NAME=votre_base_donnees
 ```
-
-Pour MongoDB Atlas (cloud) :
-```env
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/?retryWrites=true&w=majority
-MONGODB_DB_NAME=votre_base_donnees
-```
-
-**Note :** Le projet utilise `python-dotenv` pour charger les variables d'environnement. Assurez-vous que le fichier `.env` n'est pas commité dans Git (vérifiez `.gitignore`).
 
 ## Utilisation
 
@@ -147,31 +124,34 @@ Accéder à `http://localhost:8501` pour explorer :
 python data_collection/insertion_versmongo.py
 ```
 
-## Structure du Projet et Schéma d'architecture
+## Structure du Projet
 
 ```
 data_projet/
-├── .gitignore
-├── README.md
-├── requirements.txt
 ├── code/
 │   └── streamlit.py              # Dashboard principal
-├── data/                         # Données (brutes et nettoyées)
+├── data/
+│   ├── raw/                      # Données brutes
+│   │   ├── events.csv
+│   │   ├── category_tree.csv
+│   │   └── item_properties_part1.csv
+│   └── clean/                    # Données nettoyées
+│       ├── events_clean.csv
+│       ├── category_tree_clean.csv
+│       └── item_properties_clean.csv
 ├── data_collection/
-│   └── insertion_versmongo.py    # Script d'insertion MongoDB
-├── images/
-│   ├── image1.png                # Schéma d'architecture
-│   └── image2.png                # Visualisation des données
+│   └── insertion_versmongo.py    # Script MongoDB
 ├── Notebook/
-│   ├── traitement.ipynb          # Analyse et nettoyage des données
+│   ├── traitement.ipynb          # Analyse et nettoyage
 │   └── ABtesting.ipynb           # Tests A/B
-└── src/
-    ├── insertion.py              # Code source additionnel
-    └── test_mongo.py             # Test MongoDB
+├── config/                       # Configuration
+├── docs/                         # Documentation
+├── src/                          # Code source additionnel
+├── .env                          # Variables d'environnement
+├── .gitignore
+├── README.md
+└── requirements.txt
 ```
-![Architecture du projet](./images/image1.png)
-## Schéma de l'architecture
-
 
 ## Jeux de Données
 
@@ -206,15 +186,13 @@ Le projet utilise le dataset **RetailRocket E-commerce** :
 - Impact sur le taux de conversion
 - Analyse par segment et temporalité
 
-## Visualisation des données avec streamlit 
+## Contribution
 
-Les données collectées et stockées dans MongoDB sont analysées et visualisées via Tableau et Streamlit pour une exploration approfondie. Voici un aperçu des tableaux de bord créés.
-
-![Visualisation](./images/imagedsh1.png)
-
-## Conclusion
-
-Ce projet d'analytics e-commerce a permis de transformer des données brutes complexes en insights stratégiques actionnables. En combinant traitement de données avancé, tests statistiques rigoureux et visualisation interactive, nous avons créé une plateforme complète pour la prise de décision data-driven.
+1. Fork le projet
+2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
+3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrir une Pull Request
 
 ## 📝 Licence
 
@@ -222,8 +200,14 @@ Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de
 
 ## 👥 Auteur
 
-**Touré abdoul-aziz** 
+**Votre Nom** - *Description du rôle*
 
+## 🙏 Remerciements
+
+- Dataset fourni par [RetailRocket](https://www.kaggle.com/retailrocket/ecommerce-dataset)
+- Communauté Streamlit pour l'inspiration
+- Librairies open-source utilisées
 
 ---
 
+⭐ **Note** : Ce projet est un exemple d'analyse de données e-commerce. Les insights générés peuvent être adaptés selon vos besoins métier spécifiques.
