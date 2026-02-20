@@ -47,8 +47,8 @@ Ce document détaille toutes les fonctionnalités, métriques et visualisations 
 │  │   - Répartition des Événements (Funnel)                  │  │
 │  │   - Top Produits                                         │  │
 │  │   - Analyse Horaire                                       │  │
-│  │   - Comportement Utilisateurs                            │  │
-│  └──────────────────────────────────────────────────────────┘  │
+│  │   - Comport │  │
+│  └────────────────────────────────────────────────ement Utilisateurs                           ──────────┘  │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────┐  │
 │  │ Section 3: Données Détaillées                            │  │
@@ -130,28 +130,28 @@ Le dashboard charge trois fichiers CSV nettoyés depuis `data/clean/`:
 
 ### Section 2 : Visualisations Interactives (5 onglets)
 
-#### Onglet 1 : 📈 Tendances Temporelles
+#### Onglet 1 : Tendances Temporelles
 - **Graphique Principal** : Évolution des événements par période (jour/semaine/mois)
 - **Graphique Secondaire** : Évolution des transactions uniquement
 - **Interactivité** : Zoom, pan, hover, légende cliquable
 
-#### Onglet 2 : 🎯 Répartition des Événements
+#### Onglet 2 : Répartition des Événements
 - **Graphique Camembert** : Répartition en pourcentage par type
 - **Graphique en Barres** : Nombre absolu par type
 - **Entonnoir de Conversion** : Vue → Panier → Transaction
 - **Graphique des Taux** : Comparaison des taux de conversion
 
-#### Onglet 3 : 🛍️ Top Produits
+#### Onglet 3 : Top Produits
 - **Top 20 par Vues** : Produits les plus consultés
 - **Top 20 par Transactions** : Produits les plus vendus
 - **Tableau Détaillé** : itemid, Vues, Transactions, Taux de Conversion
 
-#### Onglet 4 : ⏰ Analyse Horaire
+#### Onglet 4 : Analyse Horaire
 - **Événements par Heure** : Distribution 0-23h
 - **Événements par Jour** : Distribution lundi-dimanche
 - **Heatmap** : Croisement Heure × Jour
 
-#### Onglet 5 : 👥 Comportement Utilisateurs
+#### Onglet 5 : Comportement Utilisateurs
 - **Histogramme** : Distribution des événements par visiteur
 - **Camembert** : Répartition par niveau d'activité
 - **Top 20 Visiteurs** : Utilisateurs les plus actifs
@@ -222,11 +222,6 @@ Le dashboard charge trois fichiers CSV nettoyés depuis `data/clean/`:
 | **Nouveaux Clients** | Récemment acquis |
 | **Clients à Risque** | Anciens clients inactifs |
 | **Clients Perdus** | Inactifs depuis longtemps |
-
-### Top Produits Types
-- **Par Vues** : Produits populaires à forte exposition
-- **Par Transactions** : Best-sellers à promouvoir
-- **À Optimiser** : Produits à forte vue mais faible conversion
 
 ---
 
@@ -321,7 +316,7 @@ Moyenne = Total Événements / Visiteurs Uniques
 **Solution** : Vérifier les chemins dans `data/clean/`
 
 #### 2. Graphiques vides
-**Symptôme** : visualisations sans données
+**Symptôme** : Visualisations sans données
 **Solution** : Vérifier les filtres (peuvent tout exclure)
 
 #### 3. Performance lente
@@ -364,7 +359,5 @@ Moyenne = Total Événements / Visiteurs Uniques
 1. Analyser les patterns horaires/hebdomadaires
 2. Identifier les heures/jours de pointe
 3. Planifier les campagnes et le staffing
-
----
 
 
