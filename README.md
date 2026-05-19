@@ -1,213 +1,214 @@
-# E-Commerce Analytics Dashboard
+# E-Commerce Analytics Dashboard (RetailRocket)
 
-Un projet complet d'analyse de données e-commerce utilisant le dataset RetailRocket pour analyser le comportement des utilisateurs, effectuer des tests A/B et créer un tableau de bord interactif.
+Un projet complet d’analyse de données e-commerce utilisant le dataset **RetailRocket** pour :
+- comprendre le comportement utilisateur,
+- construire des métriques clés (conversion, funnel, temporalité),
+- segmenter les clients (RFM),
+- évaluer des **tests A/B**,
+- présenter le tout dans un **dashboard interactif** via Streamlit.
 
-## Description du Projet
+---
 
-Ce projet analyse les données de navigation e-commerce de RetailRocket pour comprendre le comportement des utilisateurs, optimiser les taux de conversion et effectuer des tests A/B sur différentes variantes d'interface. Le projet comprend trois composants principaux :
+## Aperçu (Screenshots)
 
-- **Traitement des données** : Nettoyage, analyse exploratoire et segmentation RFM
-- **Tests A/B** : Évaluation d'impact des variantes d'interface sur le comportement utilisateur
-- **Dashboard interactif** : Visualisation des métriques clés avec Streamlit
+![Dashboard Overview](./images/image1.png)
+
+![Dashboard : Insights / Graphiques](./images/imagedsh1.png)
+
+---
 
 ## Fonctionnalités
 
-### Analyse de Données
-- **Métriques globales** : Utilisateurs uniques, produits, transactions, taux de conversion
-- **Funnel de conversion** : Analyse du parcours client (vue → panier → achat)
-- **Analyse temporelle** : Activité par heure, jour de la semaine
-- **Segmentation RFM** : Classification des clients par Récence, Fréquence, Montant
-- **Analyse des abandons** : Produits fréquemment abandonnés dans le panier
+### Analyse de données
+- **Métriques globales** : utilisateurs uniques, produits, transactions, taux de conversion
+- **Funnel de conversion** : vue → panier → achat
+- **Analyse temporelle** : activité par heure et par jour de semaine
+- **Segmentation RFM** : Récence, Fréquence, Montant
+- **Analyse des abandons** : produits fréquemment abandonnés dans le panier
 
 ### Tests A/B
-- **Test global** : Comparaison des performances A vs B
-- **Tests par catégorie** : Impact sur les grandes et sous-catégories
-- **Tests temporels** : Performance selon l'heure et le jour
-- **Analyse UX** : Évaluation des interfaces sur le parcours utilisateur
+- **Test global** : comparaison des performances A vs B
+- **Tests par catégorie** : impact sur grandes et sous-catégories
+- **Tests temporels** : performance selon l’heure et le jour
+- **Analyse UX** : évaluation des parcours utilisateur
 
-### Dashboard Interactif
-- **KPIs principaux** : Métriques essentielles en temps réel
-- **Visualisations avancées** : Graphiques Plotly interactifs
-- **Filtres dynamiques** : Analyse par période, type d'événement
-- **Aperçu des données** : Exploration des datasets nettoyés
-- **Export de métriques** : Téléchargement des résultats
+### Dashboard interactif
+- **KPIs** et visualisations **Plotly** interactives
+- **Filtres dynamiques** (période, type d’événement, segments)
+- **Exploration** des données nettoyées
+- **Export** des résultats
 
-## Technologies Utilisées
+---
 
-- **Python** : Langage principal
-- **Pandas** : Manipulation et analyse des données
-- **Streamlit** : Interface web interactive
-- **Plotly** : Visualisations avancées
-- **MongoDB** : Stockage des données
-- **Jupyter Notebook** : Analyses exploratoires
-- **Scipy/Statsmodels** : Tests statistiques A/B
+## Technologies utilisées
+
+- **Python**
+- **Pandas**
+- **Streamlit**
+- **Plotly**
+- **MongoDB**
+- **Jupyter Notebook**
+- **SciPy / Statsmodels** (statistiques & tests A/B)
+
+---
 
 ## Installation
 
 ### Prérequis
-- Python 3.8+
+- Python **3.8+**
 - MongoDB (local ou cloud)
 - Git
 
-### Installation des Dépendances
+### Étapes
 
-1. **Cloner le repository**
+1) **Cloner le repository**
 ```bash
 git clone <https://github.com/abdoulaziz03/data_projet.git>
 cd data_projet
 ```
 
-2. **Créer un environnement virtuel**
+2) **Créer un environnement virtuel**
 ```bash
 python -m venv venv
-source venv/bin/activate  # Sur Windows: venv\Scripts\activate
+venv\Scripts\activate
 ```
 
-3. **Installer les packages**
+3) **Installer les dépendances**
 ```bash
 pip install -r requirements.txt
 ```
 
-4. **Configuration MongoDB**
-Créer un fichier `.env` à la racine :
+4) **Configurer MongoDB**
+Créer un fichier **`.env`** à la racine :
 ```env
 MONGODB_URI=mongodb://localhost:27017/
 MONGODB_DB_NAME=votre_base_donnees
 ```
 
-## Utilisation
+---
 
-### 1. Préparation des Données
+## Démarrage & Utilisation
 
+### 1) Préparation des données
+Lancer le notebook de traitement des données :
 ```bash
-# Lancer le notebook de traitement des données
 jupyter notebook Notebook/traitement.ipynb
 ```
 
 Ce notebook effectue :
-- Chargement des données brutes
-- Nettoyage et transformation
-- Analyses exploratoires
-- Segmentation RFM
-- Sauvegarde des données nettoyées
+- chargement des données brutes
+- nettoyage & transformation
+- analyses exploratoires
+- segmentation RFM
+- sauvegarde des datasets nettoyés
 
-### 2. Tests A/B
-
+### 2) Tests A/B
+Lancer l’analyse A/B :
 ```bash
-# Lancer l'analyse A/B
 jupyter notebook Notebook/ABtesting.ipynb
 ```
 
 Analyses disponibles :
-- Tests globaux de performance
-- Tests par catégorie produit
-- Tests temporels
-- Analyse des abandons de panier
+- tests globaux
+- tests par catégorie
+- tests temporels
+- analyse des abandons
 
-### 3. Dashboard Interactif
-
+### 3) Dashboard Streamlit
 ```bash
-# Lancer le dashboard Streamlit
 streamlit run code/streamlit.py
 ```
 
-Accéder à `http://localhost:8501` pour explorer :
-- Métriques en temps réel
-- Visualisations interactives
-- Filtres et segments
-- Export des données
+Accéder à : `http://localhost:8501`
 
-### 4. Intégration MongoDB
-
+### 4) Intégration MongoDB
 ```bash
-# Insérer les données nettoyées dans MongoDB
 python data_collection/insertion_versmongo.py
 ```
 
-## Structure du Projet
+---
 
-```
+## Structure du projet
+
+```text
 data_projet/
 ├── code/
-│   └── streamlit.py              # Dashboard principal
+│   └── streamlit.py                 # Dashboard principal
 ├── data/
-│   ├── raw/                      # Données brutes
+│   ├── raw/                         # Données brutes
 │   │   ├── events.csv
 │   │   ├── category_tree.csv
 │   │   └── item_properties_part1.csv
-│   └── clean/                    # Données nettoyées
+│   └── clean/                       # Données nettoyées
 │       ├── events_clean.csv
 │       ├── category_tree_clean.csv
 │       └── item_properties_clean.csv
 ├── data_collection/
-│   └── insertion_versmongo.py    # Script MongoDB
+│   └── insertion_versmongo.py      # Script MongoDB
 ├── Notebook/
-│   ├── traitement.ipynb          # Analyse et nettoyage
-│   └── ABtesting.ipynb           # Tests A/B
-├── config/                       # Configuration
-├── docs/                         # Documentation
-├── src/                          # Code source additionnel
-├── .env                          # Variables d'environnement
+│   ├── traitement.ipynb            # Analyse et nettoyage
+│   └── ABtesting.ipynb             # Tests A/B
+├── config/                          # Configuration
+├── docs/                            # Documentation
+├── src/                             # Code source additionnel
+├── .env                             # Variables d’environnement
 ├── .gitignore
 ├── README.md
 └── requirements.txt
 ```
 
-## Jeux de Données
+---
 
-Le projet utilise le dataset **RetailRocket E-commerce** :
-- **Events** : 2.7M+ événements utilisateur (vues, ajouts panier, achats)
-- **Category Tree** : Hiérarchie des catégories produits
-- **Item Properties** : Propriétés détaillées des produits
+## Jeu de données
 
-### Métriques Clés
-- **2,756,101** événements utilisateur
-- **1,407,580** visiteurs uniques
-- **235,061** produits catalogués
-- **11,359** transactions
-- Période : Mai-Juillet 2015
+Le projet utilise **RetailRocket E-commerce** :
+- **Events** : événements utilisateur (vues, ajouts panier, achats)
+- **Category Tree** : hiérarchie des catégories
+- **Item Properties** : propriétés détaillées des produits
 
-## Analyses Disponibles
+### Repères (ordre de grandeur)
+- 2,756,101 événements utilisateur
+- 1,407,580 visiteurs uniques
+- 235,061 produits catalogués
+- 11,359 transactions
+- Période : mai → juillet 2015
 
-### Métriques Globales
-- Taux de conversion : 0.41%
-- Sessions/visiteur moyen : 2.0
-- Heure de pointe : 20h
-- Jour le plus actif : Vendredi
-
-### Segmentation Client
-- **Champions** : Clients récents, fréquents et à forte valeur
-- **Nouveaux Clients** : Récemment acquis
-- **Clients à Risque** : Anciens clients inactifs
-- **Clients Perdus** : Inactifs depuis longtemps
-
-### Tests A/B
-- Comparaison de variantes d'interface
-- Impact sur le taux de conversion
-- Analyse par segment et temporalité
+---
 
 ## Contribution
 
 1. Fork le projet
-2. Créer une branche feature (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
+2. Créer une branche :
+   ```bash
+   git checkout -b feature/AmazingFeature
+   ```
+3. Commit :
+   ```bash
+   git commit -m "Add some AmazingFeature"
+   ```
+4. Push :
+   ```bash
+   git push origin feature/AmazingFeature
+   ```
 5. Ouvrir une Pull Request
-
-## 📝 Licence
-
-Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
-
-## 👥 Auteur
-
-**Votre Nom** - *Description du rôle*
-
-## 🙏 Remerciements
-
-- Dataset fourni par [RetailRocket](https://www.kaggle.com/retailrocket/ecommerce-dataset)
-- Communauté Streamlit pour l'inspiration
-- Librairies open-source utilisées
 
 ---
 
-⭐ **Note** : Ce projet est un exemple d'analyse de données e-commerce. Les insights générés peuvent être adaptés selon vos besoins métier spécifiques.
+## Licence
+
+Ce projet est sous licence **MIT**. Voir le fichier `LICENSE`.
+
+---
+
+## Remerciements
+
+- Dataset : [RetailRocket](https://www.kaggle.com/retailrocket/ecommerce-dataset)
+- Communauté **Streamlit** et bibliothèques open-source
+
+---
+
+## Auteur
+
+**Touré Abdoul-aziz**
+
+
